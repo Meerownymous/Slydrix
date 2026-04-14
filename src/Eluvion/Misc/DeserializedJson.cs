@@ -5,7 +5,7 @@ using Tonga.Scalar;
 namespace Eluvion.Misc;
 
 /// <summary>A scalar whose value is the given JSON text deserialized as <typeparamref name="TResult"/>.</summary>
-public sealed class FromJSON<TResult>(TextMorph txt) : ScalarEnvelope<TResult>(() =>
+public sealed class DeserializedJson<TResult>(TextMorph txt) : ScalarEnvelope<TResult>(() =>
     JsonSerializer.Deserialize<TResult>(txt.Str(), new JsonSerializerOptions()
     {
         PropertyNameCaseInsensitive = true
@@ -13,6 +13,6 @@ public sealed class FromJSON<TResult>(TextMorph txt) : ScalarEnvelope<TResult>((
 )
 {
     /// <summary>A scalar whose value is the given text interpreted as JSON and deserialized as <typeparamref name="TResult"/>.</summary>
-    public FromJSON(IText text) : this(new TextMorph(text))
+    public DeserializedJson(IText text) : this(new TextMorph(text))
     { }
 }

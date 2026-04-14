@@ -1,6 +1,4 @@
-using Eluvion.Trigger;
-
-namespace Eluvion.Seed;
+namespace Eluvion.Trigger;
 
 /// <summary>A trigger delegating to the given trigger, implicitly constructible from an Action.</summary>
 public sealed class TriggerMorph(ITrigger trigger) : TriggerEnvelope(trigger)

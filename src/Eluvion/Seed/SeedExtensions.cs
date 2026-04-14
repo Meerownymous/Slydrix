@@ -1,3 +1,5 @@
+using Eluvion.Trigger;
+
 namespace Eluvion.Seed;
 
 public static class SeedExtensions

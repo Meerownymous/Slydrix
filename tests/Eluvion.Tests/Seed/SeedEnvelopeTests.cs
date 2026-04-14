@@ -10,13 +10,13 @@ public sealed class SeedEnvelopeTests
 {
     [Fact]
     public async Task Yield_DelegatesToWrappedSeed()
-        => Assert.Equal(42, await new SeedIf<int>((() => true, () => 42)).Yield());
+        => Assert.Equal(42, await new SeedSwitch<int>((() => true, () => 42)).Yield());
 
     [Fact]
     public async Task Effect_ReceivesYieldedValue()
     {
         var received = 0;
-        await new SeedIf<int>((() => true, () => 42))
+        await new SeedSwitch<int>((() => true, () => 42))
             .Effect(new AsEffect<int>(ipt => received = ipt))
             .Yield();
         Assert.Equal(42, received);
@@ -26,7 +26,7 @@ public sealed class SeedEnvelopeTests
     public async Task Trigger_ExecutesTrigger()
     {
         var called = false;
-        await new SeedIf<int>((() => true, () => 0))
+        await new SeedSwitch<int>((() => true, () => 0))
             .Trigger(new AsTrigger(() => called = true))
             .Yield();
         Assert.True(called);
@@ -34,7 +34,7 @@ public sealed class SeedEnvelopeTests
 
     [Fact]
     public async Task Weave_TransformsYieldedValue()
-        => Assert.Equal("42", await new SeedIf<int>((() => true, () => 42))
+        => Assert.Equal("42", await new SeedSwitch<int>((() => true, () => 42))
             .Weave(new AsWeave<int, string>(x => x.ToString()))
             .Yield());
 }

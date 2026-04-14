@@ -29,13 +29,13 @@ Because each primitive is its own class, it can be tested in isolation, replaced
 
 ```csharp
 var post = await new SeedFromJson<CreatePostCommand>(requestBody)
-    .Effect(new ValidateWith<CreatePostCommand>(validator))       
-    .Weave(new EnrichWithAuthor(userId, userRepo))
-    .Weave(new BuildPost())
-    .Effect(new SaveToRepo<Post>(postRepo))                       
-    .Effect(new IndexForSearch(searchIndex))
-    .Trigger(new PublishEvent<PostCreated>(eventBus))             
-    .Trigger(new NotifyFollowers(userId, followRepo, pushClient))
+    .Effect(new Validated<CreatePostCommand>(validator))
+    .Weave(new WithAuthor(userId, userRepo))
+    .Weave(new AsPost())
+    .Effect(new InRepo<Post>(postRepo))
+    .Effect(new InSearchIndex(searchIndex))
+    .Trigger(new Published<PostCreated>(eventBus))
+    .Trigger(new FollowerNotification(userId, followRepo, pushClient))
     .Yield();
 ```
 
@@ -45,11 +45,11 @@ var post = await new SeedFromJson<CreatePostCommand>(requestBody)
 
 ```csharp
 var post = await postId.AsSeed()
-    .Weave(new LoadFromRepo<Post>(postRepo))                      
-    .Effect(new IncrementLikeCount(postRepo))
-    .Effect(new RecordInteraction(userId, analyticsRepo))
-    .Trigger(new PublishEvent<PostLiked>(eventBus))               
-    .Trigger(new NotifyAuthor(postRepo, pushClient))
+    .Weave(new FromRepo<Post>(postRepo))
+    .Effect(new LikeCount(postRepo))
+    .Effect(new Interaction(userId, analyticsRepo))
+    .Trigger(new Published<PostLiked>(eventBus))
+    .Trigger(new AuthorNotification(postRepo, pushClient))
     .Yield();
 ```
 
@@ -59,12 +59,12 @@ var post = await postId.AsSeed()
 
 ```csharp
 var deleted = await new SeedIf<Post>(
-        (() => currentUser.Owns(postId), new LoadFromRepo<Post>(postRepo)),   
-        (() => currentUser.IsAdmin,      new LoadFromRepo<Post>(postRepo))    
+        (() => currentUser.Owns(postId), new FromRepo<Post>(postRepo)),
+        (() => currentUser.IsAdmin,      new FromRepo<Post>(postRepo))
     )
-    .Effect(new RemoveFromRepo<Post>(postRepo))                   
-    .Effect(new RemoveFromIndex(searchIndex))
-    .Trigger(new PublishEvent<PostDeleted>(eventBus))             
+    .Effect(new Absent<Post>(postRepo))
+    .Effect(new AbsentFromIndex(searchIndex))
+    .Trigger(new Published<PostDeleted>(eventBus))
     .Trigger(new AsTrigger(() => auditLog.Record(postId, currentUser)))
     .Yield();
 ```
@@ -75,11 +75,11 @@ var deleted = await new SeedIf<Post>(
 
 ```csharp
 var feed = await userId.AsSeed()
-    .Weave(new LoadFollowedUserIds(followRepo))
-    .Weave(new LoadRecentPosts(postRepo, since: DateTimeOffset.UtcNow.AddDays(-2)))
-    .Weave(new RankByRelevance(rankingService))
-    .Weave(new PaginateResults<Post>(page, pageSize))             
-    .Effect(new RecordFeedView(userId, analyticsRepo))
+    .Weave(new FollowedUserIds(followRepo))
+    .Weave(new RecentPosts(postRepo, since: DateTimeOffset.UtcNow.AddDays(-2)))
+    .Weave(new ByRelevance(rankingService))
+    .Weave(new Page<Post>(page, pageSize))
+    .Effect(new FeedView(userId, analyticsRepo))
     .Yield();
 ```
 
@@ -89,16 +89,15 @@ var feed = await userId.AsSeed()
 
 ```csharp
 var comment = await new SeedFromJson<CommentCommand>(requestBody)
-    .Effect(new ValidateWith<CommentCommand>(validator))          
-    .Weave(new SanitizeHtmlFields())                             
-    .Weave(new ExtractMentions(userRepo))
-    .Weave(new BuildComment(userId))
-    .Effect(new SaveToRepo<Comment>(commentRepo))                 
-    .Effect(new IncrementCommentCount(postRepo))
-    .Trigger(new NotifyPostAuthor(postRepo, pushClient))
-    .Trigger(new NotifyMentionedUsers(pushClient))
-    .Trigger(new PublishEvent<CommentPosted>(eventBus))           
+    .Effect(new Validated<CommentCommand>(validator))
+    .Weave(new HtmlSafe())
+    .Weave(new WithMentions(userRepo))
+    .Weave(new AsComment(userId))
+    .Effect(new InRepo<Comment>(commentRepo))
+    .Effect(new CommentCount(postRepo))
+    .Trigger(new PostAuthorNotification(postRepo, pushClient))
+    .Trigger(new MentionedUsersNotification(pushClient))
+    .Trigger(new Published<CommentPosted>(eventBus))
     .Yield();
 ```
 
----
