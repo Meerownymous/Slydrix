@@ -7,6 +7,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assets", "Assets", "{CFA4D4A2-06C3-4CF8-877A-FCF80808A3BD}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
+		DESIGN_GUIDE.md = DESIGN_GUIDE.md
 	EndProjectSection
 EndProject
 Global
