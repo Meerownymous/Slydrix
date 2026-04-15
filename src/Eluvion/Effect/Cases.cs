@@ -153,31 +153,3 @@ public sealed class Cases<T0, T1, T2, T3, T4, T5, T6, T7, T8>(
     )
 )
 { }
-
-/// <summary>An effect that fires the matching handler for a 10-case union.</summary>
-public sealed class Cases<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>(
-    Func<T0, IEffect<T0>> on0,
-    Func<T1, IEffect<T1>> on1,
-    Func<T2, IEffect<T2>> on2,
-    Func<T3, IEffect<T3>> on3,
-    Func<T4, IEffect<T4>> on4,
-    Func<T5, IEffect<T5>> on5,
-    Func<T6, IEffect<T6>> on6,
-    Func<T7, IEffect<T7>> on7,
-    Func<T8, IEffect<T8>> on8,
-    Func<T9, IEffect<T9>> on9
-) : EffectEnvelope<OneOf<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>>(
-    oneOf => oneOf.Match(
-        t0 => on0(t0).Fire(t0),
-        t1 => on1(t1).Fire(t1),
-        t2 => on2(t2).Fire(t2),
-        t3 => on3(t3).Fire(t3),
-        t4 => on4(t4).Fire(t4),
-        t5 => on5(t5).Fire(t5),
-        t6 => on6(t6).Fire(t6),
-        t7 => on7(t7).Fire(t7),
-        t8 => on8(t8).Fire(t8),
-        t9 => on9(t9).Fire(t9)
-    )
-)
-{ }
