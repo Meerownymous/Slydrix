@@ -23,6 +23,41 @@ Because each primitive is its own class, it can be tested in isolation, replaced
 
 ---
 
+## Subscription
+
+`Subscription<T>` is a seed that drives the pipeline from an `IObservable<T>`. The full pipeline runs once for every emitted value. `.Yield()` blocks until the observable completes or the cancellation token is cancelled, and returns the last processed value.
+
+```csharp
+await new Subscription<DomainEvent>(eventBus.Stream("post-events"), cancellationToken)
+    .Craft(new EnrichedWithAuthor(userRepo))
+    .Effect(new InSearchIndex(searchIndex))
+    .Trigger(new Published<EventProcessed>(outboundBus))
+    .Yield();
+```
+
+The subscription is cleaned up automatically — no explicit unsubscribe required.
+
+---
+
+## Cases
+
+`Cases<T0, T1, ...>` is an effect for discriminated unions (`OneOf<T0, T1, ...>`). It inspects the active case and fires the matching handler, passing the concrete type — not the union wrapper.
+
+```csharp
+var result = await new SeedFromJson<ModeratePostCommand>(requestBody)
+    .Craft(new FromRepo<Post>(postRepo))
+    .Craft(new ModerationOutcome(moderationService))   // returns OneOf<Approved, Rejected>
+    .Effect(new Cases<Approved, Rejected>(
+        approved => new InRepo<Approved>(publishQueue),
+        rejected => new AsEffect<Rejected>(r => notifyAuthor(r.Reason))
+    ))
+    .Yield();
+```
+
+`Cases` supports up to ten type parameters, covering all arities provided by the [OneOf](https://github.com/mcintyre321/OneOf) library.
+
+---
+
 ## Social Network — Flow Examples
 
 ### 1. Create Post
