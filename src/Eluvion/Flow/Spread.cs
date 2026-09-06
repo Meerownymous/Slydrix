@@ -21,3 +21,9 @@ public sealed class Spread<T>(ISeed<IEnumerable<T>> origin) : IFlow<T>
     public IFlow<TNewSpawn> Craft<TNewSpawn>(ICraft<T, TNewSpawn> craft) =>
         new CraftedFlow<T, TNewSpawn>(this, craft);
 }
+
+public static partial class FlowSmarts
+{
+    /// <summary>A flow spawning every item this seed yielded.</summary>
+    public static IFlow<T> Spread<T>(this ISeed<IEnumerable<T>> origin) => new Spread<T>(origin);
+}

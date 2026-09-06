@@ -13,6 +13,15 @@ Every flow is built from four primitives:
 
 Flows start acting when calling `.Yield()`, which will activate the whole pipeline and result in the final value.
 
+Every primitive can be constructed directly (`new AsCraft<int, string>(x => x.ToString())`) or through its extensions, which are named `…Smarts` after Tonga's convention (`SeedSmarts`, `CraftSmarts`, `EffectSmarts`, `TriggerSmarts`, `FlowSmarts`) and arrive with the `using` of their namespace. An extension wraps and returns; it computes nothing.
+
+```csharp
+42.AsSeed()                          // ISeed<int>
+  .Craft(x => x.ToString())          // instead of .Craft(new AsCraft<int, string>(…))
+  .Effect(Console.WriteLine)
+  .Yield();
+```
+
 ### Why Eluvion
 
 A use case tends to grow into a single method that does everything: loads data, validates, transforms, persists, notifies. Reading it means untangling what belongs together and what is just incidental noise.
@@ -111,7 +120,7 @@ A seed yields one value. A source of many is an `IFlow<T>`, carrying the same fo
 
 ```csharp
 var flow =
-    new ObservedFlow<DomainEvent>(eventBus.Stream("post-events"))
+    eventBus.Stream("post-events").AsFlow()
         .Craft(new EnrichedWithAuthor(userRepo))
         .Effect(new InSearchIndex(searchIndex))
         .Trigger(new Published<EventProcessed>(outboundBus));
@@ -125,10 +134,10 @@ await foreach (var processed in flow.Yield(cancellationToken)) { … }
 
 ```csharp
 var flow =
-    new Spread<Post>(
-        userId.AsSeed().Craft(new RecentPosts(postRepo))   // ISeed<IEnumerable<Post>>
-    )
-    .Effect(new InSearchIndex(searchIndex));
+    userId.AsSeed()
+        .Craft(new RecentPosts(postRepo))   // ISeed<IEnumerable<Post>>
+        .Spread()                           // IFlow<Post>
+        .Effect(new InSearchIndex(searchIndex));
 ```
 
 ### From a flow back to a seed
@@ -142,7 +151,7 @@ Three seeds say what to take from a flow. A flow can spawn nothing, so `FirstOf`
 | `Drained<T>` | `IEnumerable<T>` — everything the flow spawned |
 
 ```csharp
-var last = await new LastOf<DomainEvent>(flow, cancellationToken).Yield();
+var last = await flow.LastOf(cancellationToken).Yield();
 last.IfHas(evt => log.Record(evt));
 ```
 

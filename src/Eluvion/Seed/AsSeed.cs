@@ -1,4 +1,3 @@
-using Eluvion.Craft;
 using Tonga;
 
 namespace Eluvion.Seed;
@@ -36,11 +35,18 @@ public sealed class AsSeed<TSeed>(Func<Task<TSeed>> spawnAsync) : ISeed<TSeed>
 
 public static partial class SeedSmarts
 {
+    /// <summary>A seed holding this value.</summary>
     public static ISeed<TSeed> AsSeed<TSeed>(this TSeed seed) => new AsSeed<TSeed>(seed);
-    
-    public static ISeed<TMapped> Mapped<TSeed, TMapped>(this ISeed<TSeed> seed, CraftMorph<TSeed, TMapped> mapping) =>
-        seed.Craft(mapping);
-    
-    public static ISeed<TMapped> Mapped<TSeed, TMapped>(this ISeed<TSeed> seed, Func<TSeed, TMapped> mapping) =>
-        seed.Craft(new AsCraft<TSeed, TMapped>(mapping));
+
+    /// <summary>A seed whose value is the result of this task.</summary>
+    public static ISeed<TSeed> AsSeed<TSeed>(this Task<TSeed> seed) => new AsSeed<TSeed>(seed);
+
+    /// <summary>A seed whose value this factory provides.</summary>
+    public static ISeed<TSeed> AsSeed<TSeed>(this Func<TSeed> seed) => new AsSeed<TSeed>(seed);
+
+    /// <summary>A seed whose value this async factory provides.</summary>
+    public static ISeed<TSeed> AsSeed<TSeed>(this Func<Task<TSeed>> seed) => new AsSeed<TSeed>(seed);
+
+    /// <summary>A seed whose value this scalar provides.</summary>
+    public static ISeed<TSeed> AsSeed<TSeed>(this IScalar<TSeed> seed) => new AsSeed<TSeed>(seed);
 }

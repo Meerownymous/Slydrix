@@ -12,3 +12,10 @@ public sealed class LastOf<T>(IFlow<T> flow, CancellationToken ct = default) : S
     return last;
 })
 { }
+
+public static partial class SeedSmarts
+{
+    /// <summary>A seed holding the last value this flow spawns, if it spawns one.</summary>
+    public static ISeed<IOptional<T>> LastOf<T>(this IFlow<T> flow, CancellationToken ct = default) =>
+        new LastOf<T>(flow, ct);
+}

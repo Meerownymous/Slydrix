@@ -4,7 +4,7 @@ using Eluvion.Trigger;
 
 namespace Eluvion.Flow;
 
-public static class FlowExtensions
+public static partial class FlowSmarts
 {
     public static IFlow<T> Trigger<T>(
         this IFlow<T> origin, Action trigger

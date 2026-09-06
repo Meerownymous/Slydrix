@@ -16,3 +16,9 @@ public sealed class AsFlow<T>(Func<CancellationToken, IAsyncEnumerable<T>> spawn
     public IFlow<TNewSpawn> Craft<TNewSpawn>(ICraft<T, TNewSpawn> craft) =>
         new CraftedFlow<T, TNewSpawn>(this, craft);
 }
+
+public static partial class FlowSmarts
+{
+    /// <summary>A flow spawning the values of this async sequence.</summary>
+    public static IFlow<T> AsFlow<T>(this IAsyncEnumerable<T> source) => new AsFlow<T>(source);
+}

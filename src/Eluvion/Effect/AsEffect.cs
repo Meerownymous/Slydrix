@@ -45,3 +45,11 @@ public sealed class AsEffect<TIn>(Func<TIn,Task> act) : IEffect<TIn>
 
 }
 
+public static partial class EffectSmarts
+{
+    /// <summary>An effect acting through this action.</summary>
+    public static IEffect<TIn> AsEffect<TIn>(this Action<TIn> act) => new AsEffect<TIn>(act);
+
+    /// <summary>An effect acting through this async function.</summary>
+    public static IEffect<TIn> AsEffect<TIn>(this Func<TIn, Task> act) => new AsEffect<TIn>(act);
+}

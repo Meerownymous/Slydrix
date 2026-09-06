@@ -51,8 +51,8 @@ public sealed class AsSeedTests
     }
 
     [Fact]
-    public async Task Mapped_TransformsYieldedValue()
+    public async Task Craft_TransformsYieldedValue()
         => Assert.Equal("42", await new AsSeed<int>(42)
-            .Mapped(x => x.ToString())
+            .Craft(x => x.ToString())
             .Yield());
 }

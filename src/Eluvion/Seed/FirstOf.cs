@@ -11,3 +11,10 @@ public sealed class FirstOf<T>(IFlow<T> flow, CancellationToken ct = default) : 
     return new OptEmpty<T>();
 })
 { }
+
+public static partial class SeedSmarts
+{
+    /// <summary>A seed holding the first value this flow spawns, if it spawns one.</summary>
+    public static ISeed<IOptional<T>> FirstOf<T>(this IFlow<T> flow, CancellationToken ct = default) =>
+        new FirstOf<T>(flow, ct);
+}

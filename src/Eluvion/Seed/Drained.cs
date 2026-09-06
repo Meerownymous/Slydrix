@@ -9,3 +9,10 @@ public sealed class Drained<T>(IFlow<T> flow, CancellationToken ct = default) : 
     return drained;
 })
 { }
+
+public static partial class SeedSmarts
+{
+    /// <summary>A seed holding everything this flow spawns.</summary>
+    public static ISeed<IEnumerable<T>> Drained<T>(this IFlow<T> flow, CancellationToken ct = default) =>
+        new Drained<T>(flow, ct);
+}

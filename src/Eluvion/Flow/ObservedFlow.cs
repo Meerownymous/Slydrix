@@ -26,3 +26,9 @@ public sealed class ObservedFlow<T>(IObservable<T> source) : IFlow<T>
     public IFlow<TNewSpawn> Craft<TNewSpawn>(ICraft<T, TNewSpawn> craft) =>
         new CraftedFlow<T, TNewSpawn>(this, craft);
 }
+
+public static partial class FlowSmarts
+{
+    /// <summary>A flow spawning everything this observable emits.</summary>
+    public static IFlow<T> AsFlow<T>(this IObservable<T> source) => new ObservedFlow<T>(source);
+}
