@@ -126,7 +126,7 @@ Attributes define rules.
 
 Validation is executed explicitly:
 
-.Craft(Validated<T>)
+.Effect(Validated<T>)
 
 ---
 
@@ -144,7 +144,7 @@ Explicit mapping:
 
 var post = await new SeedFromJson<CreatePostRequest>(body)
     .Craft(ToCreatePostCommand)
-    .Craft(Validated<CreatePostCommand>)
+    .Effect(Validated<CreatePostCommand>)
     .Craft(WithAuthor)
     .Craft(AsPost)
     .Effect(new InRepo<Post>(repo))
