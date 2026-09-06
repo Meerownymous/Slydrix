@@ -32,13 +32,6 @@ public abstract class EffectEnvelope<TIn>(IEffect<TIn> origin) : IEffect<TIn>
     public IEffect<TIn> Effect(IEffect<TIn> effect) => new EffectLink<TIn>(this, effect);
 
     public ICraft<TIn, TOut> Craft<TOut>(ICraft<TIn, TOut> craft) =>
-        new CraftLink<TIn, TIn, TOut>(
-            new AsCraft<TIn, TIn>(async ipt =>
-            {
-                await Fire(ipt);
-                return ipt;
-            }),
-            craft
-        );
+        new Effected<TIn, TOut>(this, craft);
 }
 

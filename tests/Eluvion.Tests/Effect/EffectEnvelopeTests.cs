@@ -48,4 +48,19 @@ public sealed class EffectEnvelopeTests
         => Assert.Equal(42, await new CraftAsEffect<int, int>(new AsCraft<int, int>(x => x))
             .Craft(new AsCraft<int, int>(x => x))
             .Yield(42));
+
+    [Fact]
+    public async Task Craft_FiresEffectOnInput()
+    {
+        var seen = 0;
+        var crafted =
+            await new CraftAsEffect<int, int>(new AsCraft<int, int>(x =>
+                {
+                    seen = x;
+                    return x;
+                }))
+                .Craft(new AsCraft<int, int>(x => x + 1))
+                .Yield(42);
+        Assert.Equal((42, 43), (seen, crafted));
+    }
 }

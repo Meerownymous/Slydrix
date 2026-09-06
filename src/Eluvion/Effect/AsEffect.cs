@@ -41,10 +41,7 @@ public sealed class AsEffect<TIn>(Func<TIn,Task> act) : IEffect<TIn>
         );
 
     public ICraft<TIn, TOut> Craft<TOut>(ICraft<TIn, TOut> craft) =>
-        new CraftLink<TIn, TIn, TOut>(
-            new AsCraft<TIn, TIn>(ipt => Task.FromResult(ipt)),
-            new AsCraft<TIn, TOut>(ipt => craft.Yield(ipt))
-        );
+        new Effected<TIn, TOut>(this, craft);
 
 }
 

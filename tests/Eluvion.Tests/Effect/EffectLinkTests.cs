@@ -78,4 +78,18 @@ public sealed class EffectLinkTests
                 new AsEffect<int>(_ => { }))
             .Craft(new AsCraft<int, int>(x => x))
             .Yield(42));
+
+    [Fact]
+    public async Task Craft_FiresBothEffectsOnInput()
+    {
+        var first = 0;
+        var second = 0;
+        var crafted =
+            await new EffectLink<int>(
+                    new AsEffect<int>(ipt => first = ipt),
+                    new AsEffect<int>(ipt => second = ipt))
+                .Craft(new AsCraft<int, int>(x => x + 1))
+                .Yield(42);
+        Assert.Equal((42, 42, 43), (first, second, crafted));
+    }
 }

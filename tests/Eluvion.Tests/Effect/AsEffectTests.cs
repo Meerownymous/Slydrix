@@ -64,4 +64,15 @@ public sealed class AsEffectTests
         => Assert.Equal(42, await new AsEffect<int>(_ => { })
             .Craft(new AsCraft<int, int>(x => x))
             .Yield(42));
+
+    [Fact]
+    public async Task Craft_FiresEffectOnInput()
+    {
+        var seen = 0;
+        var crafted =
+            await new AsEffect<int>(ipt => seen = ipt)
+                .Craft(new AsCraft<int, int>(x => x + 1))
+                .Yield(42);
+        Assert.Equal((42, 43), (seen, crafted));
+    }
 }

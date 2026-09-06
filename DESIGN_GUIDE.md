@@ -163,6 +163,30 @@ A pipeline of objects representing facts.
    - Effect
    - Trigger
 6. Naming = result
+7. One interface per class
+
+---
+
+## One Interface Per Class
+
+A class implements exactly one of the library's interfaces.
+
+Correct:
+- Effected : ICraft
+- Rechecked : IFact
+- CraftedSeed : ISeed
+
+Incorrect:
+- Cases : IEffect, ICraft
+
+A class that would carry two roles is two classes.
+
+.NET's own contracts do not count against this rule, because they
+are framework functionality rather than a role in this library:
+
+- IDisposable, IAsyncDisposable
+- IEquatable, IComparable
+- IEnumerable (the non-generic one C# requires alongside IEnumerable<T>)
 
 ---
 

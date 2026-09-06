@@ -24,12 +24,5 @@ public sealed class AsTrigger(Func<Task> act) : ITrigger
         );
 
     public ICraft<TIn, TOut> Craft<TIn, TOut>(ICraft<TIn, TOut> craft) =>
-        new CraftLink<TIn, TIn, TOut>(
-            new AsCraft<TIn, TIn>(async ipt =>
-            {
-                await Act();
-                return ipt;
-            }),
-            craft
-        );
+        new Triggered<TIn, TOut>(this, craft);
 }

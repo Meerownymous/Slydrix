@@ -30,10 +30,8 @@ public sealed class AsSeed<TSeed>(Func<Task<TSeed>> spawnAsync) : ISeed<TSeed>
     public ISeed<TSeed> Effect(IEffect<TSeed> effect) =>
         new SeedLink<TSeed>(this, effect);
 
-    public ISeed<TNewSpan> Craft<TNewSpan>(ICraft<TSeed, TNewSpan> craft) =>
-        new AsSeed<TNewSpan>(async () =>
-            await craft.Yield(await Yield())
-        );
+    public ISeed<TNewSpawn> Craft<TNewSpawn>(ICraft<TSeed, TNewSpawn> craft) =>
+        new CraftedSeed<TSeed, TNewSpawn>(this, craft);
 }
 
 public static partial class SeedSmarts

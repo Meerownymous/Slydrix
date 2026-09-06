@@ -23,22 +23,11 @@ public class SeedLink<TSeed>(ISeed<TSeed> first, Func<TSeed, Task> second) : ISe
     }
 
     public ISeed<TSeed> Trigger(ITrigger trigger) =>
-        new AsSeed<TSeed>(async () =>
-            {
-                var result = await Yield();
-                await trigger.Act();
-                return result;
-            }
-        );
+        new SeedLink<TSeed>(this, trigger);
 
     public ISeed<TSeed> Effect(IEffect<TSeed> effect) =>
-        new AsSeed<TSeed>(async () =>
-        {
-            var seed = await Yield();
-            await effect.Fire(seed);
-            return seed;
-        });
+        new SeedLink<TSeed>(this, effect);
 
     public ISeed<TNewSeed> Craft<TNewSeed>(ICraft<TSeed, TNewSeed> craft) =>
-        new AsSeed<TNewSeed>(async () => await craft.Yield(await Yield()));
+        new CraftedSeed<TSeed, TNewSeed>(this, craft);
 }

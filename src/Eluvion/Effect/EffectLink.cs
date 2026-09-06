@@ -24,12 +24,5 @@ public sealed class EffectLink<TIn>(
         new EffectLink<TIn>(this, effect);
 
     public ICraft<TIn, TOut> Craft<TOut>(ICraft<TIn, TOut> craft) =>
-        new CraftLink<TIn, TIn, TOut>(
-            new AsCraft<TIn, TIn>(async ipt =>
-            {
-                await this.Fire(ipt);
-                return ipt;
-            }),
-            craft
-        );
+        new Effected<TIn, TOut>(this, craft);
 }
