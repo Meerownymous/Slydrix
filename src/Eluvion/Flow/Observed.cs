@@ -1,6 +1,6 @@
 using System.Threading.Channels;
 
-namespace Eluvion.Seed;
+namespace Eluvion.Flow;
 
 /// <summary>Bridges an IObservable source into a channel by forwarding each event to the channel writer.</summary>
 public sealed class Observed<T>(ChannelWriter<T> writer) : IObserver<T>

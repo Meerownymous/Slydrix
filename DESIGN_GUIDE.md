@@ -68,6 +68,19 @@ No booleans.
 - optional → 0..1
 - collection → n
 
+Cardinality lives in the type, not in a flag:
+
+- ISeed<T>       → exactly one value
+- IFlow<T>       → 0..n values, the chain runs once per value
+- IOptional<T>   → 0..1 value
+
+Crossing between them is explicit:
+
+- Spread     : ISeed<IEnumerable<T>> → IFlow<T>
+- FirstOf    : IFlow<T> → ISeed<IOptional<T>>
+- LastOf     : IFlow<T> → ISeed<IOptional<T>>
+- Drained    : IFlow<T> → ISeed<IEnumerable<T>>
+
 Example:
 
 static IEnumerable<Post> DeletableBy(User u, Post p)
@@ -113,7 +126,7 @@ Attributes define rules.
 
 Validation is executed explicitly:
 
-.Craft(Validated<T>)
+.Effect(Validated<T>)
 
 ---
 
@@ -131,7 +144,7 @@ Explicit mapping:
 
 var post = await new SeedFromJson<CreatePostRequest>(body)
     .Craft(ToCreatePostCommand)
-    .Craft(Validated<CreatePostCommand>)
+    .Effect(Validated<CreatePostCommand>)
     .Craft(WithAuthor)
     .Craft(AsPost)
     .Effect(new InRepo<Post>(repo))
@@ -163,6 +176,30 @@ A pipeline of objects representing facts.
    - Effect
    - Trigger
 6. Naming = result
+7. One interface per class
+
+---
+
+## One Interface Per Class
+
+A class implements exactly one of the library's interfaces.
+
+Correct:
+- Effected : ICraft
+- Rechecked : IFact
+- CraftedSeed : ISeed
+
+Incorrect:
+- Cases : IEffect, ICraft
+
+A class that would carry two roles is two classes.
+
+.NET's own contracts do not count against this rule, because they
+are framework functionality rather than a role in this library:
+
+- IDisposable, IAsyncDisposable
+- IEquatable, IComparable
+- IEnumerable (the non-generic one C# requires alongside IEnumerable<T>)
 
 ---
 

@@ -3,7 +3,7 @@ using Eluvion.Trigger;
 
 namespace Eluvion.Effect;
 
-public static class EffectExtensions
+public static partial class EffectSmarts
 {
     public static IEffect<TInput> Trigger<TInput>(
         this IEffect<TInput> origin, 

@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Eluvion.Tests.Seed;
 
-public sealed class SeedExtensionsTests
+public sealed class SeedSmartsTests
 {
     [Fact]
     public async Task TriggersWithSyncFunction()

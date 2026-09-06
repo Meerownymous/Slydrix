@@ -8,24 +8,10 @@ public sealed class CraftLink<TIn,TInAndOut,TOut>(
 {
     public async Task<TOut> Yield(TIn ipt) => await second.Yield(await first.Yield(ipt));
     public ICraft<TIn, TOut> Trigger(ITrigger trigger) =>
-        new CraftLink<TIn, TOut, TOut>(
-            this,
-            new AsCraft<TOut, TOut>(async resultFromFirst =>
-            {
-                await trigger.Act();
-                return resultFromFirst;
-            })
-        );
+        new CraftLink<TIn, TOut, TOut>(this, new Unchanged<TOut>(trigger));
 
     public ICraft<TIn, TOut> Effect(IEffect<TOut> effect) =>
-        new CraftLink<TIn, TOut, TOut>(
-            this,
-            new AsCraft<TOut, TOut>(async resultFromFirst =>
-            {
-                await effect.Fire(resultFromFirst);
-                return resultFromFirst;
-            })
-        );
+        new CraftLink<TIn, TOut, TOut>(this, new Unchanged<TOut>(effect));
 
     public ICraft<TIn, TOutNext> Craft<TOutNext>(ICraft<TOut, TOutNext> next) =>
         new CraftLink<TIn, TOut, TOutNext>(this, next);

@@ -3,7 +3,7 @@ using Eluvion.Trigger;
 
 namespace Eluvion.Craft;
 
-public static class CraftExtensions
+public static partial class CraftSmarts
 {
     public static ICraft<TInput, TCrafted> Trigger<TInput, TCrafted>(
         this ICraft<TInput, TCrafted> origin, Action trigger

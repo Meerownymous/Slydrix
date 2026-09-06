@@ -1,7 +1,7 @@
 using Eluvion.Trigger;
 using Xunit;
 
-namespace Eluvion.Tests.Seed;
+namespace Eluvion.Tests.Trigger;
 
 public sealed class TriggerMorphTests
 {

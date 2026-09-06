@@ -41,10 +41,15 @@ public sealed class AsEffect<TIn>(Func<TIn,Task> act) : IEffect<TIn>
         );
 
     public ICraft<TIn, TOut> Craft<TOut>(ICraft<TIn, TOut> craft) =>
-        new CraftLink<TIn, TIn, TOut>(
-            new AsCraft<TIn, TIn>(ipt => Task.FromResult(ipt)),
-            new AsCraft<TIn, TOut>(ipt => craft.Yield(ipt))
-        );
+        new Effected<TIn, TOut>(this, craft);
 
 }
 
+public static partial class EffectSmarts
+{
+    /// <summary>An effect acting through this action.</summary>
+    public static IEffect<TIn> AsEffect<TIn>(this Action<TIn> act) => new AsEffect<TIn>(act);
+
+    /// <summary>An effect acting through this async function.</summary>
+    public static IEffect<TIn> AsEffect<TIn>(this Func<TIn, Task> act) => new AsEffect<TIn>(act);
+}

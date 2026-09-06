@@ -1,5 +1,7 @@
 using Xunit;
+using Eluvion.Fact;
 using Eluvion.Seed;
+using Tonga;
 
 namespace Eluvion.Tests.Seed
 {
@@ -30,5 +32,25 @@ namespace Eluvion.Tests.Seed
             => await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 new SeedSwitch<int>((() => false, () => 0)).Yield()
             );
+
+        [Fact]
+        public async Task Yield_WithFacts_ReturnsFirstHolding()
+            => Assert.Equal(2, await new SeedSwitch<int>(
+                ((IFact)new Rechecked(() => false), (ISeed<int>)new AsSeed<int>(1)),
+                (new Rechecked(() => true), new AsSeed<int>(2))
+            ).Yield());
+
+        [Fact]
+        public async Task Yield_RechecksConditionOnEveryYield()
+        {
+            var takeFirst = true;
+            var seed = new SeedSwitch<int>(
+                (() => takeFirst, () => 1),
+                (() => true, () => 2)
+            );
+            var before = await seed.Yield();
+            takeFirst = false;
+            Assert.Equal((1, 2), (before, await seed.Yield()));
+        }
     }
 }
