@@ -68,6 +68,19 @@ No booleans.
 - optional → 0..1
 - collection → n
 
+Cardinality lives in the type, not in a flag:
+
+- ISeed<T>       → exactly one value
+- IFlow<T>       → 0..n values, the chain runs once per value
+- IOptional<T>   → 0..1 value
+
+Crossing between them is explicit:
+
+- Spread     : ISeed<IEnumerable<T>> → IFlow<T>
+- FirstOf    : IFlow<T> → ISeed<IOptional<T>>
+- LastOf     : IFlow<T> → ISeed<IOptional<T>>
+- Drained    : IFlow<T> → ISeed<IEnumerable<T>>
+
 Example:
 
 static IEnumerable<Post> DeletableBy(User u, Post p)

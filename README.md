@@ -103,19 +103,48 @@ var comment = await new SeedFromJson<CommentCommand>(requestBody)
     .Yield();
 ```
 
-## Subscription
+## Flows — a source of many values
 
-`Subscription<T>` is a seed that drives the pipeline from an `IObservable<T>`. The full pipeline runs once for every emitted value. `.Yield()` blocks until the observable completes or the cancellation token is cancelled, and returns the last processed value.
+A seed yields one value. A source of many is an `IFlow<T>`, carrying the same four primitives: the whole chain runs once per value.
+
+`ObservedFlow<T>` spawns everything an `IObservable<T>` emits:
 
 ```csharp
-await new Subscription<DomainEvent>(eventBus.Stream("post-events"), cancellationToken)
-    .Craft(new EnrichedWithAuthor(userRepo))
-    .Effect(new InSearchIndex(searchIndex))
-    .Trigger(new Published<EventProcessed>(outboundBus))
-    .Yield();
+var flow =
+    new ObservedFlow<DomainEvent>(eventBus.Stream("post-events"))
+        .Craft(new EnrichedWithAuthor(userRepo))
+        .Effect(new InSearchIndex(searchIndex))
+        .Trigger(new Published<EventProcessed>(outboundBus));
+
+await foreach (var processed in flow.Yield(cancellationToken)) { … }
 ```
 
-The subscription is cleaned up automatically — no explicit unsubscribe required.
+`Yield()` hands back an `IAsyncEnumerable<T>` and runs nothing until it is enumerated. The subscription is released when the observable completes, when the token is cancelled, or when the consumer stops enumerating — no explicit unsubscribe required.
+
+`Spread<T>` turns a seed that yielded many items into a flow, which is how a craft of cardinality `0..n` connects to the rest:
+
+```csharp
+var flow =
+    new Spread<Post>(
+        userId.AsSeed().Craft(new RecentPosts(postRepo))   // ISeed<IEnumerable<Post>>
+    )
+    .Effect(new InSearchIndex(searchIndex));
+```
+
+### From a flow back to a seed
+
+Three seeds say what to take from a flow. A flow can spawn nothing, so `FirstOf` and `LastOf` hand back Tonga's `IOptional<T>` rather than a null:
+
+| Seed | Value |
+|---|---|
+| `FirstOf<T>` | `IOptional<T>` — the first value, stops the flow there |
+| `LastOf<T>` | `IOptional<T>` — the last value |
+| `Drained<T>` | `IEnumerable<T>` — everything the flow spawned |
+
+```csharp
+var last = await new LastOf<DomainEvent>(flow, cancellationToken).Yield();
+last.IfHas(evt => log.Record(evt));
+```
 
 ---
 
